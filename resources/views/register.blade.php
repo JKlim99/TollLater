@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Laravel</title>
+    <title>TollLater - Registration</title>
 
     @vite('resources/css/app.css')
 </head>
@@ -66,7 +66,7 @@
                                 <span class="label-text">Password</span>
                             </label>
                             <input type="password" name="password" id="password" placeholder="Password"
-                                class="input input-bordered" required/>
+                                class="input input-bordered" onkeyup='check();' required/>
                         </div>
                         <div class="form-control">
                             <label class="label">

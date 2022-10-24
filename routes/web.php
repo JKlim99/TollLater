@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\BillController;
+use App\Http\Controllers\ProfileController;
 
 use App\Http\Middleware\Admin;
 use App\Http\Middleware\Guest;
@@ -30,6 +32,11 @@ Route::middleware([Guest::class])->group(function () {
 
 Route::middleware([User::class])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard']);
+    Route::get('/pay', [BillController::class, 'payPage']);
+    Route::get('/bills', [BillController::class, 'billPage']);
+    Route::get('/receipts', [BillController::class, 'receiptPage']);
+    Route::get('/profile', [ProfileController::class, 'profilePage']);
+    Route::post('/profile', [ProfileController::class, 'updateProfile']);
     Route::get('/logout', [LoginController::class, 'logout']);
 });
 
