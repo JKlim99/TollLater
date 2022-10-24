@@ -23,8 +23,8 @@ $active = 'dashboard'
 <div class="p-2">
     <div class="card bg-primary text-primary-content shadow-lg">
         <div class="card-body">
-            <h2 class="card-title">Welcome back,</h2>
-            <p>Lim Jinq Kuen</p>
+            <p>Welcome back,</p>
+            <h2 class="card-title">Lim Jinq Kuen</h2>
         </div>
     </div>
 </div>
