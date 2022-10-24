@@ -32,11 +32,16 @@ Route::middleware([Guest::class])->group(function () {
 
 Route::middleware([User::class])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard']);
+    Route::post('/addcard', [DashboardController::class, 'addCard']);
+
     Route::get('/pay', [BillController::class, 'payPage']);
+
     Route::get('/bills', [BillController::class, 'billPage']);
     Route::get('/receipts', [BillController::class, 'receiptPage']);
+
     Route::get('/profile', [ProfileController::class, 'profilePage']);
     Route::post('/profile', [ProfileController::class, 'updateProfile']);
+
     Route::get('/logout', [LoginController::class, 'logout']);
 });
 

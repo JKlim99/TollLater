@@ -35,7 +35,7 @@ class CardModel extends Model
 
     public function bills()
     {
-        return $this->hasMany(BillModel::class, 'card_id');
+        return $this->hasMany(BillModel::class, 'card_id')->orderBy('created_at', 'desc');
     }
 
     public function user()

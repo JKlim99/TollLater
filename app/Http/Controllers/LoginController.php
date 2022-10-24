@@ -32,6 +32,7 @@ class LoginController extends Controller
 
         $request->session()->put('id', $user->id);
         $request->session()->put('type', 'user');
+        $request->session()->put('key', $user->hash);
 
         return redirect('/dashboard');
     }

@@ -35,7 +35,7 @@
             </div>
         </div>
     </div>
-    <div class="bg-base-200 min-h-screen">
+    <div class="bg-base-200 min-h-screen" style="padding-bottom:100px">
         @yield('content')
     </div>
     <?php

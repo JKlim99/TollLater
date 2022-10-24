@@ -4,6 +4,22 @@
 <?php
 $active = 'dashboard'
 ?>
+@if(session('card_notice') ?? false)
+<div class="p-2" id="card-notice">
+    <div class="alert alert-success shadow-lg">
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>Your card has been added!</span>
+        </div>
+        <div class="flex-none">
+            <button class="btn btn-sm" onclick="hide()">Got it</button>
+        </div>
+    </div>
+</div>
+@endif
 <div class="p-2">
     <div class="card bg-primary text-primary-content shadow-lg">
         <div class="card-body">
@@ -13,20 +29,35 @@ $active = 'dashboard'
     </div>
 </div>
 <h3 class="font-medium leading-tight text-3xl m-2">My Cards</h3>
+@foreach($cards as $card)
 <div class="card bg-base-content text-primary-content shadow-xl m-2">
     <div class="card-body">
-        <h2 class="card-title">Card # 123412341234</h2>
-        <h4 class="text-right font-medium leading-tight text-2xl">RM45.20</h4>
-        <p class="text-right">Amount due by 14 Aug 2022</p>
+        <h2 class="card-title">Card # {{$card->card_serial_no}}</h2>
+        <h4 class="text-right font-medium leading-tight text-2xl">RM{{number_format($card->amount, 2, '.', ',');}}</h4>
+        <p class="text-right">@if($card->amount == 0.00) No amount due @else Amount due by
+            {{date('d M Y', strtotime($card->due_date));}} @endif</p>
     </div>
 </div>
+@endforeach
+@if($penalty)
+<div class="card bg-error text-primary-content shadow-xl m-2">
+    <div class="card-body">
+        <h2 class="card-title">PENALTY</h2>
+        <h4 class="text-right font-medium leading-tight text-2xl">RM{{number_format($penalty->amount, 2, '.', ',');}}
+        </h4>
+        <p class="text-right">@if($penalty->amount == 0.00) No amount due @else Amount due by
+            {{date('d M Y', strtotime($penalty->due_date));}} @endif</p>
+    </div>
+</div>
+@else
 <div class="card bg-error text-primary-content shadow-xl m-2">
     <div class="card-body">
         <h2 class="card-title">PENALTY</h2>
         <h4 class="text-right font-medium leading-tight text-2xl">RM0.00</h4>
-        <p class="text-right">Amount due by 14 Aug 2022</p>
+        <p class="text-right">No amount due</p>
     </div>
 </div>
+@endif
 <a href="#add-card-modal">
     <div
         class="card bg-neutral text-primary-content shadow-xl m-2 hover:-translate-y-1 hover:bg-neutral-focus duration-300 transition ease-in-out delay-150">
@@ -42,13 +73,31 @@ $active = 'dashboard'
 </a>
 <div class="modal" id="add-card-modal">
     <div class="modal-box">
-        <h3 class="font-bold text-lg">Add New Card</h3>
-        <p class="py-4">Please enter your card serial number.</p>
-        <input type="number" placeholder="Card serial number" class="input input-bordered w-full max-w-xs" />
-        <div class="modal-action">
-            <a href="/addcard" class="btn btn-primary">Add Card</a>
-            <a href="#" class="btn">Cancel</a>
-        </div>
+        <form method="POST" action="/addcard">
+            @csrf
+            <h3 class="font-bold text-lg">Add New Card</h3>
+            <p class="py-4">Please enter your card serial number.</p>
+            <input type="text" placeholder="Card serial number" name="card_serial_no"
+                class="input input-bordered w-full max-w-xs" onkeyup='errorNoted();'/>
+                @if(session('error'))
+                <label class="label" id="error">
+                    <span class="label-text-alt text-error">{{session('error')}}</span>
+                </label>
+                @endif
+            <div class="modal-action">
+                <button type="submit" class="btn btn-primary">Add Card</button>
+                <a href="#" class="btn">Cancel</a>
+            </div>
+        </form>
     </div>
 </div>
+
+<script>
+    var hide = function () {
+        document.getElementById('card-notice').style.display = 'none';
+    }
+    var errorNoted = function () {
+        document.getElementById('error').style.display = 'none';
+    }
+</script>
 @endsection
