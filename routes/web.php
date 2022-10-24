@@ -30,5 +30,6 @@ Route::middleware([Guest::class])->group(function () {
 
 Route::middleware([User::class])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard']);
+    Route::get('/logout', [LoginController::class, 'logout']);
 });
 
