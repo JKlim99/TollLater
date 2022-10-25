@@ -71,6 +71,6 @@ class DashboardController extends Controller
             'due_date' => date('Y-m-d'),
         ]);
 
-        return redirect('/dashboard')->with(['card_notice'=>true]);
+        return redirect('/dashboard')->with(['notice'=>'Your new card has been added.']);
     }
 }

@@ -54,11 +54,9 @@ class UserModel extends Model
         });
 
         self::updating(function($model){
-            dd($model->secret_key);
             if(strlen($model->secret_key) != 60)
             {
-                $hash = $model->generateRandomString();
-                $model->attributes['hash'] = $hash;
+                $hash = $model->hash;
                 $model->attributes['secret_key'] = Hash::make($model->secret_key.$hash);
             }
         });
