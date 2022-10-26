@@ -35,16 +35,16 @@ class TransactionModel extends Model
 
     public function user()
     {
-        return $this->belongTo(UserModel::class, 'user_id');
+        return $this->belongsTo(UserModel::class, 'user_id');
     }
 
     public function card()
     {
-        return $this->belongTo(CardModel::class, 'card_id');
+        return $this->belongsTo(CardModel::class, 'card_id');
     }
 
     public function station()
     {
-        return $this->belongTo(TollStationModel::class, 'toll_station_id');
+        return $this->belongsTo(TollStationModel::class, 'toll_station_id');
     }
 }

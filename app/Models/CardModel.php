@@ -40,6 +40,6 @@ class CardModel extends Model
 
     public function user()
     {
-        return $this->belongTo(UserModel::class, 'user_id');
+        return $this->belongsTo(UserModel::class, 'user_id');
     }
 }

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ClosedStationPriceModel extends Model
+class UnpaidBillModel extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class ClosedStationPriceModel extends Model
      *
      * @var string
      */
-    protected $table = 'closed_station_price';
+    protected $table = 'unpaid_bill';
 
     /**
      * The attributes that are mass assignable.
@@ -22,18 +22,12 @@ class ClosedStationPriceModel extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'toll_station_id',
-        'entry_id',
-        'price'
+        'bill_id',
+        'unpaid_bill_id'
     ];
 
-    public function station()
+    public function bill()
     {
-        return $this->belongsTo(TollStationModel::class, 'toll_station_id');
-    }
-
-    public function entryStation()
-    {
-        return $this->belongsTo(TollStationModel::class, 'entry_id');
+        return $this->belongsTo(BillModel::class, 'unpaid_bill_id');
     }
 }

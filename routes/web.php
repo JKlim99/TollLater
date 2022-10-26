@@ -38,6 +38,8 @@ Route::middleware([User::class])->group(function () {
 
     Route::get('/bills', [BillController::class, 'billPage']);
     Route::get('/receipts', [BillController::class, 'receiptPage']);
+    Route::get('/pdf/bill/{id}', [BillController::class, 'pdfBill']);
+    Route::get('/pdf/receipt/{id}', [BillController::class, 'pdfReceipt']);
 
     Route::get('/profile', [ProfileController::class, 'profilePage']);
     Route::post('/profile', [ProfileController::class, 'updateProfile']);

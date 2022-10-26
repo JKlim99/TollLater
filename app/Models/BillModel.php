@@ -36,10 +36,10 @@ class BillModel extends Model
 
     public function user()
     {
-        return $this->belongTo(UserModel::class, 'user_id');
+        return $this->belongsTo(UserModel::class, 'user_id');
     }
 
     public function card(){
-        return $this->belongTo(CardModel::class, 'card_id');
+        return $this->belongsTo(CardModel::class, 'card_id');
     }
 }

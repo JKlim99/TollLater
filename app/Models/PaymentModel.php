@@ -40,11 +40,11 @@ class PaymentModel extends Model
 
     public function user()
     {
-        return $this->belongTo(UserModel::class, 'user_id');
+        return $this->belongsTo(UserModel::class, 'user_id');
     }
 
     public function bill()
     {
-        return $this->belongTo(BillModel::class, 'bill_id');
+        return $this->belongsTo(BillModel::class, 'bill_id');
     }
 }
