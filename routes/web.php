@@ -35,6 +35,9 @@ Route::middleware([User::class])->group(function () {
     Route::post('/addcard', [DashboardController::class, 'addCard']);
 
     Route::get('/pay', [BillController::class, 'payPage']);
+    Route::post('/pay', [BillController::class, 'pay']);
+    Route::get('/success', [BillController::class, 'paySuccess']);
+    Route::get('/cancel', [BillController::class, 'payCancel']);
 
     Route::get('/bills', [BillController::class, 'billPage']);
     Route::get('/receipts', [BillController::class, 'receiptPage']);

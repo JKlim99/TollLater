@@ -18,7 +18,139 @@ class BillController extends Controller
 {
     public function payPage()
     {
-        return view('pay');
+        $user_id = session('id');
+        $key = session('key');
+        $user = UserModel::where('id', $user_id)->where('hash', $key)->first();
+        if(!$user){
+            return redirect('/logout');
+        }
+        $name = $user->fullname;
+        
+        $cards = DB::table('user')
+                        ->select(DB::raw('max(bill.id) as id'), 'card.card_serial_no', DB::raw('max(bill.due_date) as due_date'),  DB::raw('sum(bill.amount) as amount'))
+                        ->leftJoin('card', 'user.id', '=', 'card.user_id')
+                        ->leftJoin('bill', 'card.id', '=', 'bill.card_id')
+                        ->where('user.id', $user_id)
+                        ->where('card.status', 'active')
+                        ->where('bill.status', 'unpaid')
+                        ->orderBy('bill.created_at', 'desc')
+                        ->groupBy('bill.card_id', 'card.card_serial_no')
+                        ->get();
+
+        $penalty = DB::table('user')
+                        ->select(DB::raw('max(bill.id) as id'), DB::raw('max(bill.due_date) as due_date'),  DB::raw('sum(bill.amount) as amount'))
+                        ->join('bill', 'user.id', '=', 'bill.user_id')
+                        ->where('user.id', $user_id)
+                        ->whereNull('bill.card_id')
+                        ->where('bill.status', 'unpaid')
+                        ->orderBy('bill.created_at', 'desc')
+                        ->groupBy('bill.user_id')
+                        ->first();
+
+        return view('pay')->with(['cards'=>$cards, 'penalty'=>$penalty]);
+    }
+
+    public function pay(Request $request)
+    {
+        $user_id = session('id');
+        $key = session('key');
+        $user = UserModel::where('id', $user_id)->where('hash', $key)->first();
+        if(!$user){
+            return redirect('/logout');
+        }
+
+        $amount = 0.00;
+        $subtotals = [];
+        $bill_ids = $request->input('bills', []);
+        if(count($bill_ids) == 0)
+        {
+            return redirect()->back()->with(['error_notice'=>'No bill selected. Please select at least 1 bill,']);
+        }
+
+        foreach($bill_ids as $bill_id)
+        {
+            $subtotal = 0.00;
+            $bill = BillModel::where('user_id', $user_id)->where('id', $bill_id)->where('status', 'unpaid')->where('amount', '>', 0.00)->first();
+            if(!$bill)
+            {
+                return redirect()->back()->with(['error_notice'=>'Bill not found.']);
+            }
+            $subtotal += $bill->amount;
+
+            $unpaid_bills = UnpaidBillModel::where('bill_id', $bill_id)->get();
+            foreach($unpaid_bills as $unpaid_bill)
+            {
+                $subtotal += $unpaid_bill->bill->amount;
+            }
+
+            $subtotals[] = $subtotal;
+            $amount += $subtotal;
+        }
+
+        \Stripe\Stripe::setApiKey(env('stripe_secret_key'));
+
+        $checkout_session = \Stripe\Checkout\Session::create([
+            'success_url' => 'http://localhost:8000/success?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => 'http://localhost:8000/cancel?session_id={CHECKOUT_SESSION_ID}',
+            'line_items' => [
+                [
+                    'price_data' => [
+                        'currency' => 'myr',
+                        'product_data' => [
+                            'name' => 'TollLater Bill Payment',
+                        ],
+                        'unit_amount' => $amount*100,
+                    ],
+                    'quantity' => 1,
+                ],
+            ],
+            'mode' => 'payment',
+        ]);
+
+        $i = 0;
+        foreach($bill_ids as $bill_id)
+        {
+            $payment = PaymentModel::create([
+                'bill_id' => $bill_id,
+                'user_id' => $user_id,
+                'ref_id' => $checkout_session->id,
+                'amount' => $subtotals[$i],
+            ]);
+
+            $i++;
+        }
+
+        return redirect($checkout_session->url);
+    }
+
+    public function paySuccess(Request $request)
+    {
+        $stripe_ref_id = $_GET['session_id'] ?? '';
+        $payments = PaymentModel::where('ref_id', $stripe_ref_id)->get();
+
+        foreach($payments as $payment)
+        {
+            $bill = BillModel::where('id', $payment->bill_id)->update(['status'=>'paid']);
+            $unpaid_bills = UnpaidBillModel::where('bill_id', $payment->bill_id)->get();
+            foreach($unpaid_bills as $unpaid_bill)
+            {
+                $bill = BillModel::where('id', $unpaid_bill->unpaid_bill_id)->update(['status'=>'paid']);
+            }
+        }
+        PaymentModel::where('ref_id', $stripe_ref_id)->update(['status'=>'success']);
+
+        return view('paySuccess');
+    }
+
+    public function payCancel(Request $request)
+    {
+        $stripe_ref_id = $_GET['session_id'] ?? '';
+        if($stripe_ref_id)
+        {
+            PaymentModel::where('ref_id', $stripe_ref_id)->delete();
+        }
+
+        return view('payCancel');
     }
 
     public function billPage(Request $request)
