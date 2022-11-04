@@ -59,6 +59,9 @@ Route::get('/admin/logout', [AdminLoginController::class, 'logout']);
 
 Route::middleware([Admin::class])->group(function () {
     Route::get('/admin/users', [AdminController::class, 'userList']);
+    Route::get('/admin/create/user', [AdminController::class, 'createUserPage']);
+    Route::post('/admin/create/user', [AdminController::class, 'createUser']);
+    Route::get('/admin/delete/user/{id}', [AdminController::class, 'deleteUser']);
 });
 
 Route::middleware([TollOperator::class])->group(function () {
