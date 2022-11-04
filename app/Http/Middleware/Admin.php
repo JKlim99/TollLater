@@ -26,6 +26,10 @@ class Admin
             {
                 return redirect('/dashboard');
             }
+            else if($session == 'operator')
+            {
+                return redirect('/operator/stations');
+            }
         }
         return $next($request);
     }

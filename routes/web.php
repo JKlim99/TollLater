@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminLoginController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
@@ -8,6 +11,7 @@ use App\Http\Controllers\BillController;
 use App\Http\Controllers\ProfileController;
 
 use App\Http\Middleware\Admin;
+use App\Http\Middleware\TollOperator;
 use App\Http\Middleware\Guest;
 use App\Http\Middleware\User;
 
@@ -27,7 +31,8 @@ Route::middleware([Guest::class])->group(function () {
     Route::get('/register', [RegisterController::class, 'registerPage']);
     Route::post('/register', [RegisterController::class, 'register']);
 
-    Route::post('/admin', [AdminLoginController::class, 'loginPage']);
+    Route::get('/admin', [AdminLoginController::class, 'loginPage']);
+    Route::post('/admin', [AdminLoginController::class, 'login']);
 });
 
 Route::middleware([User::class])->group(function () {
@@ -50,3 +55,12 @@ Route::middleware([User::class])->group(function () {
     Route::get('/logout', [LoginController::class, 'logout']);
 });
 
+Route::get('/admin/logout', [AdminLoginController::class, 'logout']);
+
+Route::middleware([Admin::class])->group(function () {
+    Route::get('/admin/users', [AdminController::class, 'userList']);
+});
+
+Route::middleware([TollOperator::class])->group(function () {
+    Route::get('/operator/stations', [OperatorController::class, 'dashboard']);
+});

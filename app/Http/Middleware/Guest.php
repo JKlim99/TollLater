@@ -22,8 +22,12 @@ class Guest
             if($session == 'user'){
                 return redirect('/dashboard');
             }
+            else if($session == 'admin')
+            {
+                return redirect('/admin/users');
+            }
             else{
-                return redirect('/admin/dashboard');
+                return redirect('/operator/stations');
             }
             
         }
