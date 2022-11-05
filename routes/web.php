@@ -62,6 +62,10 @@ Route::middleware([Admin::class])->group(function () {
     Route::get('/admin/create/user', [AdminController::class, 'createUserPage']);
     Route::post('/admin/create/user', [AdminController::class, 'createUser']);
     Route::get('/admin/delete/user/{id}', [AdminController::class, 'deleteUser']);
+    Route::get('/admin/user/{id}', [AdminController::class, 'userDetails']);
+    Route::post('/admin/user/{id}', [AdminController::class, 'userUpdate']);
+    Route::get('/admin/ucard/{id}', [AdminController::class, 'userCards']);
+    Route::post('/admin/ucard/{id}', [AdminController::class, 'assignCard']);
 });
 
 Route::middleware([TollOperator::class])->group(function () {

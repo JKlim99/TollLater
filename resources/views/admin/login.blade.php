@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>TollLater - Login</title>
+    <title>TollLater (Management) - Login</title>
 
     @vite('resources/css/app.css')
 </head>
@@ -15,6 +15,7 @@
         <div class="">
             <div class="text-center">
                 <h1 class="text-5xl font-bold">TollLater</h1>
+                <div class="badge badge-lg mt-3">Management</div>
                 <p class="py-6">Login to access the management system.</p>
             </div>
             <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">

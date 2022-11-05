@@ -20,13 +20,13 @@ class RegisterController extends Controller
         $mobile_no = $request->input('mobile_no');
         $password = $request->input('password');
 
-        $ic_found = UserModel::where('ic_no', $ic_no)->first();
+        $ic_found = UserModel::where('ic_no', $ic_no)->withTrashed()->first();
         if($ic_found)
         {
             return redirect()->back()->withInput()->with('ic_error', 'IC Number existed');
         }
 
-        $email_found = UserModel::where('email', $email)->first();
+        $email_found = UserModel::where('email', $email)->withTrashed()->first();
         if($email_found)
         {
             return redirect()->back()->withInput()->with('email_error', 'Email existed');

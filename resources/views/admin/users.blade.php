@@ -12,7 +12,7 @@ $active = 'user';
 @section('button')
 <div class="btn-toolbar mb-2 mb-md-0">
     <a type="button" class="btn btn-sm btn-primary" href="/admin/create/user">
-        Create User
+        + Create New User
     </a>
 </div>
 @endsection
@@ -53,8 +53,7 @@ $active = 'user';
                 <td>{{$user->fullname}}</td>
                 <td>{{$user->email}}</td>
                 <td>{{date('d M Y, h:iA', strtotime($user->created_at));}}</td>
-                <td><a href="/admin/user/{{$user->id}}">Edit</a> | <a href="/admin/delete/user/{{$user->id}}"
-                        onclick="return confirm('Are you sure you want to delete this user?')">Delete</a></td>
+                <td><a href="/admin/user/{{$user->id}}">Edit</a> | <a href="/admin/delete/user/{{$user->id}}" onclick="return confirm('Are you sure you want to delete the {{$user->fullname}} user?')">Delete</a></td>
             </tr>
             <?php $count++; ?>
             @endforeach

@@ -47,7 +47,7 @@ class ProfileController extends Controller
         }
         if($user->email != $email)
         {
-            $email_found = UserModel::where('email', $email)->where('id', '!=', $user_id)->first();
+            $email_found = UserModel::where('email', $email)->where('id', '!=', $user_id)->withTrashed()->first();
             if($email_found)
             {
                 return redirect()->back()->withInput()->with('email_error', 'Email existed');
