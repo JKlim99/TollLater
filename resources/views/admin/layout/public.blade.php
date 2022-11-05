@@ -42,14 +42,12 @@
                 <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link @if($user) active @endif" aria-current="page" href="#">
-                                <span data-feather="home"></span>
+                            <a class="nav-link @if($user) active @endif" href="/admin/users">
                                 User Management
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @if($card) active @endif" href="#">
-                                <span data-feather="file"></span>
+                            <a class="nav-link @if($card) active @endif" href="/admin/cards">
                                 Card Management
                             </a>
                         </li>
@@ -76,6 +74,11 @@
         </div>
     </div>
     <script src="/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var errorNoted = function () {
+            document.getElementById('error').style.display = 'none';
+        }
+    </script>
 </body>
 
 </html>

@@ -46,8 +46,6 @@ Route::middleware([User::class])->group(function () {
 
     Route::get('/bills', [BillController::class, 'billPage']);
     Route::get('/receipts', [BillController::class, 'receiptPage']);
-    Route::get('/pdf/bill/{id}', [BillController::class, 'pdfBill']);
-    Route::get('/pdf/receipt/{id}', [BillController::class, 'pdfReceipt']);
 
     Route::get('/profile', [ProfileController::class, 'profilePage']);
     Route::post('/profile', [ProfileController::class, 'updateProfile']);
@@ -55,6 +53,11 @@ Route::middleware([User::class])->group(function () {
     Route::get('/logout', [LoginController::class, 'logout']);
 });
 
+/* PDF view routes */
+Route::get('/pdf/bill/{id}', [BillController::class, 'pdfBill']);
+Route::get('/pdf/receipt/{id}', [BillController::class, 'pdfReceipt']);
+
+/* Management system logout route */
 Route::get('/admin/logout', [AdminLoginController::class, 'logout']);
 
 Route::middleware([Admin::class])->group(function () {
@@ -66,6 +69,13 @@ Route::middleware([Admin::class])->group(function () {
     Route::post('/admin/user/{id}', [AdminController::class, 'userUpdate']);
     Route::get('/admin/ucard/{id}', [AdminController::class, 'userCards']);
     Route::post('/admin/ucard/{id}', [AdminController::class, 'assignCard']);
+    Route::get('/admin/ubill/{id}', [AdminController::class, 'userBills']);
+
+    Route::get('/admin/cards', [AdminController::class, 'cardList']);
+    Route::get('/admin/card/{id}', [AdminController::class, 'cardDetails']);
+    Route::post('/admin/card/{id}', [AdminController::class, 'updateCard']);
+    Route::get('/admin/generate/card', [AdminController::class, 'cardGenerationPage']);
+    Route::post('/admin/generate/card', [AdminController::class, 'generateCard']);
 });
 
 Route::middleware([TollOperator::class])->group(function () {

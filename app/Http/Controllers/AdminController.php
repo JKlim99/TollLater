@@ -10,6 +10,7 @@ use App\Models\BillModel;
 
 class AdminController extends Controller
 {
+    /* User Management */
     public function userList(Request $request)
     {
         $type = $request->input('type', null);
@@ -175,5 +176,133 @@ class AdminController extends Controller
         ]);
 
         return redirect('/admin/ucard/'.$id)->with(['alert_status'=>'success', 'alert_text'=>'Card has assigned successfully.']);
+    }
+
+    public function userBills(Request $request, $id)
+    {
+        $user_id = $id;
+        $user = UserModel::find($user_id);
+        if(!$user)
+        {
+            return redirect('/admin/users')->with(['alert_status'=>'error', 'alert_text'=>'User not found.']);
+        }
+
+        $card_serial_no = $request->input('card_serial_no', null);
+        $cards = CardModel::where('user_id', $user_id)->where('status', 'active')->get();
+        
+        if(count($cards) < 1 || $card_serial_no == 'penalty')
+        {
+            $bills = BillModel::where('user_id', $user_id)->whereNull('card_id')->orderBy('created_at', 'desc')->paginate(10);
+            return view('admin.userBills')->with(['bills'=>$bills, 'cards'=>$cards, 'card_serial_no'=>$card_serial_no, 'user'=>$user]);
+        }
+
+        if(!$card_serial_no)
+        {
+            $card_serial_no = $cards[0]->card_serial_no;
+        }
+        $selected_card = CardModel::where('card_serial_no', $card_serial_no)->where('user_id', $user_id)->first();
+        
+        if(!$selected_card)
+        {
+            $card_serial_no = $cards[0]->card_serial_no;
+            $selected_card = CardModel::where('card_serial_no', $card_serial_no)->where('user_id', $user_id)->first();
+        }
+
+        $bills = BillModel::where('user_id', $user_id)->where('card_id', $selected_card->id)->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('admin.userBills')->with(['bills'=>$bills, 'cards'=>$cards, 'card_serial_no'=>$card_serial_no, 'user'=>$user]);
+    }
+
+    /* Card management */
+    public function cardList(Request $request)
+    {
+        $type = $request->input('type', null);
+        $keyword = $request->input('keyword', null);
+
+        if(!$keyword)
+        {
+            $cards = CardModel::orderBy('created_at', 'desc')->paginate(10);
+        }
+        else
+        {
+            $cards = CardModel::where($type, 'LIKE', '%'.$keyword.'%')->orderBy('created_at', 'desc')->paginate(10);
+        }
+
+        return view('admin.cards')->with(['cards'=>$cards, 'type'=>$type, 'keyword'=>$keyword]);
+    }
+
+    public function cardDetails($id)
+    {
+        $card = CardModel::find($id);
+        if(!$card)
+        {
+            return redirect('/admin/cards')->with(['alert_status'=>'error', 'alert_text'=>'Card not found.']);
+        }
+
+        return view('admin.cardDetails')->with(['card'=>$card]);
+    }
+
+    public function updateCard(Request $request, $id)
+    {
+        $card = CardModel::find($id);
+        if(!$card)
+        {
+            return redirect('/admin/cards')->with(['alert_status'=>'error', 'alert_text'=>'Card not found.']);
+        }
+
+        $card_serial_no = $request->input('card_serial_no', null);
+        $status = $request->input('status', null);
+        
+        if($card_serial_no)
+        {
+            $card_found = CardModel::where('card_serial_no', $card_serial_no)->where('id', '!=', $id)->first();
+            if($card_found)
+            {
+                return redirect('/admin/card/'.$id)->with(['error'=>'Card Serial Number existed.']);
+            }
+            $card->card_serial_no = $card_serial_no;
+        }
+
+        $card->status = $status;
+        $card->update();
+        
+        return redirect('/admin/card/'.$id)->with(['alert_status'=>'success', 'alert_text'=>'Card has updated successfully.']);
+    }
+
+    public function cardGenerationPage()
+    {
+        return view('admin.cardGeneration');
+    }
+
+    public function generateCard(Request $request)
+    {
+        $batch_no = $request->input('batch_no', null);
+        $number = $request->input('number', 1);
+        if(!$batch_no)
+        {
+            return redirect('/admin/generate/card')->with(['error'=>'Batch number is necessary.']);
+        }
+
+        $last_card = CardModel::orderBy('created_at', 'desc')->first();
+        if(!$last_card)
+        {
+            $card_serial_no = 10000000;
+        }
+        else
+        {
+            $card_serial_no = $last_card->card_serial_no;
+        }
+
+        for($i=0; $i<$number; $i++)
+        {
+            $card_serial_no++;
+            CardModel::create([
+                'card_serial_no'=>$card_serial_no,
+                'batch_no'=>$batch_no,
+                'status'=>'active'
+            ]);
+        }
+
+        return redirect('/admin/cards')->with(['alert_status'=>'success', 'alert_text'=>'Cards have generated successfully']);
     }
 }

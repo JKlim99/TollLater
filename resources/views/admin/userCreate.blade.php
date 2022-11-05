@@ -90,9 +90,5 @@ $active = 'user';
             document.getElementById('button').disabled = 'disabled';
         }
     }
-
-    var errorNoted = function () {
-        document.getElementById('error').style.display = 'none';
-    }
 </script>
 @endsection
