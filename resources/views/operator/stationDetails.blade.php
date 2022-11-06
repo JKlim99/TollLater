@@ -43,8 +43,7 @@ $active = 'station';
         </label>
         <select class="form-control" name="type" onchange="showPrice(this)">
             <option value="open" @if($station->type=='open') selected @endif>Open</option>
-            <option value="closed_entry" @if($station->type=='closed_entry') selected @endif>Closed (Entry)</option>
-            <option value="closed_exit" @if($station->type=='closed_exit') selected @endif>Closed (Exit)</option>
+            <option value="closed" @if($station->type=='closed') selected @endif>Closed</option>
         </select>
     </div>
     <div class="mb-3" id="open_price" @if($station->type!='open') style="display:none" @endif>
@@ -53,10 +52,10 @@ $active = 'station';
         </label>
         <input type="number" min='0' name="price" class="form-control" step=".01" value="{{old('price', $station->price)}}"/>
     </div>
-    <div id="closed_prices" @if($station->type!='closed_entry') style="display:none" @endif>
+    <div id="closed_prices" @if($station->type!='closed') style="display:none" @endif>
         <div class="mb-3">
             <label class="form-label">
-                <span class="label-text">Closed Toll Exit Price</span>
+                <span class="label-text">Pricing based on Entry Points</span>
             </label>
             <a class="btn btn-success float-end" onclick="addPrice()">+ Add Price</a>
         </div>
@@ -112,15 +111,10 @@ $active = 'station';
             open_price.style.display = 'block';
             closed_price.style.display = 'none';
         }
-        else if(type.value == 'closed_entry')
+        else if(type.value == 'closed')
         {
             open_price.style.display = 'none';
             closed_price.style.display = 'block';
-        }
-        else
-        {
-            open_price.style.display = 'none';
-            closed_price.style.display = 'none';
         }
     }
 </script>

@@ -35,7 +35,7 @@ class OperatorController extends Controller
 
     public function createStationPage()
     {
-        $stations = TollStationModel::where('type', 'closed_exit')->get();
+        $stations = TollStationModel::where('type', 'closed')->get();
         return view('operator.stationCreate')->with(['stations'=>$stations]);
     }
 
@@ -62,14 +62,14 @@ class OperatorController extends Controller
             'price'=>$price
         ]);
 
-        if($type == 'closed_entry')
+        if($type == 'closed')
         {
             $i = 0;
             foreach($station_ids as $station_id)
             {
                 ClosedStationPriceModel::create([
-                    'toll_station_id'=>$station_id,
-                    'entry_id' => $station->id,
+                    'toll_station_id'=>$station->id,
+                    'entry_id' => $station_id,
                     'price' => $prices[$i]
                 ]);
                 $i++;
@@ -101,12 +101,12 @@ class OperatorController extends Controller
             return redirect('/operator/stations')->with(['alert_status'=>'error', 'alert_text'=>'Station not found.']);
         }
 
-        $stations = TollStationModel::where('type', 'closed_exit')->get();
+        $stations = TollStationModel::where('type', 'closed')->where('id', '!=', $id)->get();
 
         $closed_stations = [];
-        if($station->type == 'closed_entry')
+        if($station->type == 'closed')
         {
-            $closed_stations = ClosedStationPriceModel::where('entry_id', $id)->get();
+            $closed_stations = ClosedStationPriceModel::where('toll_station_id', $id)->get();
         }
 
         return view('operator.stationDetails')->with(['station'=>$station, 'stations'=>$stations, 'closed_stations'=>$closed_stations]);
@@ -136,7 +136,7 @@ class OperatorController extends Controller
             'price'=>$price
         ]);
 
-        $closed_stations = ClosedStationPriceModel::where('entry_id', $id)->get();
+        $closed_stations = ClosedStationPriceModel::where('toll_station_id', $id)->get();
 
         foreach($closed_stations as $closed_station)
         {
@@ -146,7 +146,7 @@ class OperatorController extends Controller
             }
         }
 
-        if($type == 'closed_entry')
+        if($type == 'closed')
         {
             $i = 0;
             foreach($station_ids as $station_id)
@@ -154,16 +154,16 @@ class OperatorController extends Controller
                 if($ids[$i] != 0)
                 {
                     ClosedStationPriceModel::where('id', $ids[$i])->update([
-                        'toll_station_id'=>$station_id,
-                        'entry_id' => $id,
+                        'toll_station_id'=>$id,
+                        'entry_id' => $station_id,
                         'price' => $prices[$i]
                     ]);
                 }
                 else
                 {
                     ClosedStationPriceModel::create([
-                        'toll_station_id'=>$station_id,
-                        'entry_id' => $id,
+                        'toll_station_id'=>$id,
+                        'entry_id' => $station_id,
                         'price' => $prices[$i]
                     ]);
                 }
@@ -173,7 +173,7 @@ class OperatorController extends Controller
         }
         else
         {
-            ClosedStationPriceModel::where('entry_id', $id)->delete();
+            ClosedStationPriceModel::where('toll_station_id', $id)->delete();
         }
 
         
@@ -198,8 +198,7 @@ class OperatorController extends Controller
                             $join->where('transaction.created_at', '>=', $from_date);
                             $join->where('transaction.created_at', '<=', $to_date);
                         })
-                        ->select(DB::raw('max(toll_station.name) as name'), DB::raw('max(toll_station.highway) as highway'), DB::raw('sum(transaction.amount) as amount'))
-                        ->where('toll_station.type', '!=', 'closed_entry');
+                        ->select(DB::raw('max(toll_station.name) as name'), DB::raw('max(toll_station.highway) as highway'), DB::raw('sum(transaction.amount) as amount'));
 
         if($highway)
         {

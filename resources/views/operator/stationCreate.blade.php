@@ -43,8 +43,7 @@ $active = 'station';
         </label>
         <select class="form-control" name="type" onchange="showPrice(this)">
             <option value="open">Open</option>
-            <option value="closed_entry">Closed (Entry)</option>
-            <option value="closed_exit">Closed (Exit)</option>
+            <option value="closed">Closed</option>
         </select>
     </div>
     <div class="mb-3" id="open_price">
@@ -56,7 +55,7 @@ $active = 'station';
     <div id="closed_prices" style="display:none">
         <div class="mb-3">
             <label class="form-label">
-                <span class="label-text">Closed Toll Exit Price</span>
+                <span class="label-text">Pricing based on Entry Points</span>
             </label>
             <a class="btn btn-success float-end" onclick="addPrice()">+ Add Price</a>
         </div>
@@ -108,15 +107,10 @@ $active = 'station';
             open_price.style.display = 'block';
             closed_price.style.display = 'none';
         }
-        else if(type.value == 'closed_entry')
+        else if(type.value == 'closed')
         {
             open_price.style.display = 'none';
             closed_price.style.display = 'block';
-        }
-        else
-        {
-            open_price.style.display = 'none';
-            closed_price.style.display = 'none';
         }
     }
 </script>
