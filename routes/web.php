@@ -85,4 +85,5 @@ Route::middleware([TollOperator::class])->group(function () {
     Route::get('/operator/delete/station/{id}', [OperatorController::class, 'deleteStation']);
     Route::get('/operator/station/{id}', [OperatorController::class, 'stationDetails']);
     Route::post('/operator/station/{id}', [OperatorController::class, 'stationUpdate']);
+    Route::get('/operator/reports', [OperatorController::class, 'report']);
 });

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\TollStationModel;
 use App\Models\ClosedStationPriceModel;
 
+use DB;
+
 class OperatorController extends Controller
 {
     /* Toll Staions Management */
@@ -176,5 +178,36 @@ class OperatorController extends Controller
 
         
         return redirect('/operator/station/'.$id)->with(['alert_status'=>'success', 'alert_text'=>'Station has updated successfully.']);
+    }
+
+    public function report(Request $request)
+    {
+        $from_date = $request->input('from_date', date("Y-m-d",strtotime("-1 month")));
+        $to_date = $request->input('to_date', date("Y-m-d"));
+        $highway = $request->input('highway', null);
+
+        $highways = DB::table('toll_station')
+                        ->select('highway')
+                        ->groupBy('highway')
+                        ->get();
+
+        $stations = DB::table('toll_station')
+                        ->leftJoin('transaction', function($join) use ($from_date, $to_date)
+                        {
+                            $join->on('toll_station.id', '=', 'transaction.toll_station_id');
+                            $join->where('transaction.created_at', '>=', $from_date);
+                            $join->where('transaction.created_at', '<=', $to_date);
+                        })
+                        ->select(DB::raw('max(toll_station.name) as name'), DB::raw('max(toll_station.highway) as highway'), DB::raw('sum(transaction.amount) as amount'))
+                        ->where('toll_station.type', '!=', 'closed_entry');
+
+        if($highway)
+        {
+            $stations = $stations->where('toll_station.highway', 'LIKE', '%'.$highway.'%');
+        }
+
+        $stations = $stations->groupBy('toll_station.id')->get();
+
+        return view('operator.reports')->with(['highways'=>$highways, 'from_date'=>$from_date, 'to_date'=>$to_date, 'selected_highway'=>$highway, 'stations'=>$stations]);
     }
 }

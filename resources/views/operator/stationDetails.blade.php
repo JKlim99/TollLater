@@ -51,7 +51,7 @@ $active = 'station';
         <label class="form-label">
             <span class="label-text">Open Toll Price</span>
         </label>
-        <input type="number" min='0' name="price" class="form-control" value="{{old('price', $station->price)}}"/>
+        <input type="number" min='0' name="price" class="form-control" step=".01" value="{{old('price', $station->price)}}"/>
     </div>
     <div id="closed_prices" @if($station->type!='closed_entry') style="display:none" @endif>
         <div class="mb-3">
