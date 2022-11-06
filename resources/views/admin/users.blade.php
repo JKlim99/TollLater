@@ -60,7 +60,7 @@ $active = 'user';
 
             @if($count == 0)
             <tr>
-                <td colspan="4" class="text-center">
+                <td colspan="5" class="text-center">
                     No result found.
                 </td>
             </tr>

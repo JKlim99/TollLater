@@ -79,5 +79,10 @@ Route::middleware([Admin::class])->group(function () {
 });
 
 Route::middleware([TollOperator::class])->group(function () {
-    Route::get('/operator/stations', [OperatorController::class, 'dashboard']);
+    Route::get('/operator/stations', [OperatorController::class, 'stationList']);
+    Route::get('/operator/create/station', [OperatorController::class, 'createStationPage']);
+    Route::post('/operator/create/station', [OperatorController::class, 'createStation']);
+    Route::get('/operator/delete/station/{id}', [OperatorController::class, 'deleteStation']);
+    Route::get('/operator/station/{id}', [OperatorController::class, 'stationDetails']);
+    Route::post('/operator/station/{id}', [OperatorController::class, 'stationUpdate']);
 });
