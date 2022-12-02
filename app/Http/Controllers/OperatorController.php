@@ -69,7 +69,7 @@ class OperatorController extends Controller
             {
                 ClosedStationPriceModel::create([
                     'toll_station_id'=>$station->id,
-                    'entry_id' => $station_id,
+                    'exit_id' => $station_id,
                     'price' => $prices[$i]
                 ]);
                 $i++;
@@ -155,7 +155,7 @@ class OperatorController extends Controller
                 {
                     ClosedStationPriceModel::where('id', $ids[$i])->update([
                         'toll_station_id'=>$id,
-                        'entry_id' => $station_id,
+                        'exit_id' => $station_id,
                         'price' => $prices[$i]
                     ]);
                 }
@@ -163,7 +163,7 @@ class OperatorController extends Controller
                 {
                     ClosedStationPriceModel::create([
                         'toll_station_id'=>$id,
-                        'entry_id' => $station_id,
+                        'exit_id' => $station_id,
                         'price' => $prices[$i]
                     ]);
                 }

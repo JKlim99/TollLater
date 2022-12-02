@@ -87,7 +87,7 @@ return new class extends Migration
         Schema::create('closed_station_price', function(Blueprint $table){
             $table->id();
             $table->integer('toll_station_id');
-            $table->integer('entry_id');
+            $table->integer('exit_id');
             $table->float('price', 10, 2)->default(0.00);
             $table->timestamps();
         });

@@ -23,7 +23,7 @@ class ClosedStationPriceModel extends Model
      */
     protected $fillable = [
         'toll_station_id',
-        'entry_id',
+        'exit_id',
         'price'
     ];
 
@@ -32,8 +32,8 @@ class ClosedStationPriceModel extends Model
         return $this->belongsTo(TollStationModel::class, 'toll_station_id');
     }
 
-    public function entryStation()
+    public function exitStation()
     {
-        return $this->belongsTo(TollStationModel::class, 'entry_id');
+        return $this->belongsTo(TollStationModel::class, 'exit_id');
     }
 }
