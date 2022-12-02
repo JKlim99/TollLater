@@ -100,13 +100,15 @@ class TollCollectionController extends Controller
             return errorResponse('Toll station not found.', 'T01');
         }
 
+        $amount = 0.00;
         if($station_found->type == 'open') // 'open' type
         {
+            $amount = $station_found->amount * $this->penalty_multiply;
             TransactionModel::create([
                 'card_id' => null,
                 'user_id' => $user_found->user_id,
                 'type' => 'penalty',
-                'amount' => $station_found->amount * $this->penalty_multiply,
+                'amount' => $amount,
                 'toll_station_id' => $toll_station_id,
                 'station_type' => $station_found->type,
                 'car_plate_no' => $car_plate_number
@@ -133,6 +135,8 @@ class TollCollectionController extends Controller
                 'car_plate_no' => $car_plate_number
             ]);
         }
+
+        return successResponse(['amount'=>$amount], 'Penalized RM'.number_format($amount, 2, '.', ','));
     }
 
     protected function successResponse($data, $message = null, $code = 200)
