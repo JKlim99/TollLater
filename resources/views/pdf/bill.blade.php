@@ -158,8 +158,8 @@
         @foreach($transactions as $transaction)
         <tr>
             <td>{{date('Y-m-d h:i:s A', strtotime($transaction->created_at));}}</td>
-            <td>{{ucfirst($transaction->type)}}</td>
-            <td>{{$transaction->station->name}}</td>
+            <td>{{ucfirst(str_replace('_', ' ', $transaction->type))}}</td>
+            <td>{{$card ? $transaction->station->name : '-'}}</td>
             <td>RM{{number_format($transaction->amount, 2, '.', ',');}}</td>
         </tr>
         <?php $details = true;?>

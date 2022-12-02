@@ -21,7 +21,7 @@ return new class extends Migration
             $table->float('charged', 10, 2)->nullable();
             $table->float('amount', 10, 2);
             $table->string('car_plate_no', 20)->nullable();
-            $table->integer('toll_station_id');
+            $table->integer('toll_station_id')->nullable();
             $table->string('station_type', 20);
             $table->integer('user_id');
             $table->timestamps();

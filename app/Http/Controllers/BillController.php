@@ -134,7 +134,29 @@ class BillController extends Controller
             $unpaid_bills = UnpaidBillModel::where('bill_id', $payment->bill_id)->get();
             foreach($unpaid_bills as $unpaid_bill)
             {
-                $bill = BillModel::where('id', $unpaid_bill->unpaid_bill_id)->update(['status'=>'paid']);
+                $bill = BillModel::where('id', $unpaid_bill->unpaid_bill_id)->first();
+                if($bill)
+                {
+                    $bill->status = 'paid';
+                    $bill->update();
+                    $date1 = date_create($bill->due_date);
+                    $date2 = date_create(date('Y-m-d'));
+                    $diff = date_diff($date1, $date2);
+                    $difference = $diff->format("%R%a");
+                    if($difference > 0){
+                        TransactionModel::create([
+                            'card_id' => null,
+                            'user_id' => $bill->user_id,
+                            'type' => 'penalty',
+                            'amount' => $bill->amount * 0.01 * $difference / 30,
+                            'toll_station_id' => null,
+                            'station_type' => 'late_payment',
+                            'car_plate_no' => null
+                        ]);
+                    }
+                }
+                
+                // TBC: check on due date, if due payment penalize the user on next bill
             }
         }
         PaymentModel::where('ref_id', $stripe_ref_id)->update(['status'=>'success']);
