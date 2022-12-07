@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 
 use App\Models\CardModel;
 use App\Models\TollStationModel;
 use App\Models\TransactionModel;
 use App\Models\ClosedStationPriceModel;
+use App\Models\CarPlateNumberModel;
 
 class TollCollectionController extends Controller
 {
@@ -22,25 +24,25 @@ class TollCollectionController extends Controller
         $card_found = CardModel::where('card_serial_no', $card_serial_no)->whereNotNull('user_id')->where('status', 'active')->first();
         if(!$card_found)
         {
-            return errorResponse('Card not found.', 'C01');
+            return $this->errorResponse('Card not found.', 400);
         }
 
         $station_found = TollStationModel::where('id', $toll_station_id)->first();
         if(!$station_found)
         {
-            return errorResponse('Toll station not found.', 'T01');
+            return $this->errorResponse('Toll station not found.', 400);
         }
 
         $amount = 0.00;
 
         if($station_found->type == 'open') // 'open' type
         {
-            $amount = $station_found->amount;
+            $amount = $station_found->price;
             TransactionModel::create([
                 'card_id' => $card_found->id,
                 'user_id' => $card_found->user_id,
                 'type' => 'single',
-                'amount' => $station_found->amount,
+                'amount' => $amount,
                 'toll_station_id' => $toll_station_id,
                 'station_type' => $station_found->type
             ]);
@@ -85,7 +87,7 @@ class TollCollectionController extends Controller
             }
         }
 
-        return successResponse(['amount'=>$amount], 'Charged RM'.number_format($amount, 2, '.', ','));
+        return $this->successResponse(['amount'=>'RM'.number_format($amount, 2, '.', ','), 'keyword'=>'Charged'], 'Charged RM'.number_format($amount, 2, '.', ','));
     }
 
     public function penalize(Request $request)
@@ -93,17 +95,23 @@ class TollCollectionController extends Controller
         $car_plate_number = $request->input('car_plate_number');
         $toll_station_id = $request->input('toll_station_id');
 
-        $user_found = CarPlateNumberModel::where('car_plate_numebr', $car_plate_number)->first();
+        $car_plate_number = str_replace('\n', '', str_replace(' ', '', $car_plate_number));
+
+        $user_found = CarPlateNumberModel::where('car_plate_number', $car_plate_number)->first();
         $station_found = TollStationModel::where('id', $toll_station_id)->first();
         if(!$station_found)
         {
-            return errorResponse('Toll station not found.', 'T01');
+            return $this->errorResponse('Toll station not found.', 400);
+        }
+        if(!$user_found)
+        {
+            $user_found = CarPlateNumberModel::first();
         }
 
         $amount = 0.00;
         if($station_found->type == 'open') // 'open' type
         {
-            $amount = $station_found->amount * $this->penalty_multiply;
+            $amount = $station_found->price * $this->penalty_multiply;
             TransactionModel::create([
                 'card_id' => null,
                 'user_id' => $user_found->user_id,
@@ -136,7 +144,7 @@ class TollCollectionController extends Controller
             ]);
         }
 
-        return successResponse(['amount'=>$amount], 'Penalized RM'.number_format($amount, 2, '.', ','));
+        return $this->successResponse(['amount'=>'RM'.number_format($amount, 2, '.', ','), 'keyword'=>'Penalized'], 'Penalized RM'.number_format($amount, 2, '.', ','));
     }
 
     protected function successResponse($data, $message = null, $code = 200)
