@@ -18,7 +18,7 @@ $active = 'bill';
     <form class="form-control">
         <select class="select select-bordered" name="card_serial_no" onchange="this.form.submit()">
             @foreach($cards as $card)
-            <option value="{{$card->card_serial_no}}" @if($card_serial_no == $card->card_serial_no) selected @endif>Card # {{$card->card_serial_no}}</option>
+            <option value="{{$card->card_serial_no}}" @if($card_serial_no == $card->card_serial_no) selected @endif>@if($card->name){{$card->name}}@else Card @endif #{{$card->card_serial_no}}</option>
             @endforeach
             <option value="penalty" @if($card_serial_no == 'penalty') selected @endif>Penalty</option>
         </select>

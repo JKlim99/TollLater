@@ -38,6 +38,7 @@ Route::middleware([Guest::class])->group(function () {
 Route::middleware([User::class])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard']);
     Route::post('/addcard', [DashboardController::class, 'addCard']);
+    Route::post('/editcard/{id}', [DashboardController::class, 'editCardName']);
 
     Route::get('/pay', [BillController::class, 'payPage']);
     Route::post('/pay', [BillController::class, 'pay']);

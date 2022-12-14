@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('car_plate_no', 20)->nullable();
             $table->integer('toll_station_id')->nullable();
             $table->string('station_type', 20);
-            $table->integer('user_id');
+            $table->integer('user_id')->nullable();
             $table->timestamps();
         });
 
@@ -33,6 +33,7 @@ return new class extends Migration
             $table->integer('card_serial_no');
             $table->string('batch_no', 15);
             $table->string('status', 10)->nullable();
+            $table->string('name', 255)->nullable();
             $table->timestamps();
         });
 

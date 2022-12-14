@@ -14,7 +14,7 @@ $active = 'pay'
             <label class="cursor-pointer">
                 <div class="card bg-base-content text-primary-content shadow-xl m-2">
                     <div class="card-body">
-                        <h2 class="card-title"><input type="checkbox" name="bills[]" class="checkbox checkbox-primary bg-base-100" price="{{number_format($card->amount, 2, '.', ',');}}" onclick="calculateTotal()" value="{{$card->id}}"/>Card # {{$card->card_serial_no}}</h2>
+                        <h2 class="card-title"><input type="checkbox" name="bills[]" class="checkbox checkbox-primary bg-base-100" price="{{number_format($card->amount, 2, '.', ',');}}" onclick="calculateTotal()" value="{{$card->id}}"/>@if($card->name){{$card->name}}@else Card @endif #{{$card->card_serial_no}}</h2>
                         <h4 class="text-right font-medium leading-tight text-2xl">RM{{number_format($card->amount, 2, '.', ',');}}</h4>
                         <p class="text-right">Amount due by {{date('d M Y', strtotime($card->due_date));}}</p>
                     </div>

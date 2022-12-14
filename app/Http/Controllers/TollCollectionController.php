@@ -103,9 +103,10 @@ class TollCollectionController extends Controller
         {
             return $this->errorResponse('Toll station not found.', 400);
         }
-        if(!$user_found)
+        $user_id = null;
+        if($user_found)
         {
-            $user_found = CarPlateNumberModel::first();
+            $user_id = $user_found->user_id;
         }
 
         $amount = 0.00;
@@ -114,7 +115,7 @@ class TollCollectionController extends Controller
             $amount = $station_found->price * $this->penalty_multiply;
             TransactionModel::create([
                 'card_id' => null,
-                'user_id' => $user_found->user_id,
+                'user_id' => $user_id,
                 'type' => 'penalty',
                 'amount' => $amount,
                 'toll_station_id' => $toll_station_id,
@@ -135,7 +136,7 @@ class TollCollectionController extends Controller
 
             TransactionModel::create([
                 'card_id' => null,
-                'user_id' => $user_found->user_id,
+                'user_id' => $user_id,
                 'type' => 'penalty',
                 'amount' => $amount,
                 'toll_station_id' => $toll_station_id,

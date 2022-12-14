@@ -27,14 +27,14 @@ class BillController extends Controller
         $name = $user->fullname;
         
         $cards = DB::table('user')
-                        ->select(DB::raw('max(bill.id) as id'), 'card.card_serial_no', DB::raw('max(bill.due_date) as due_date'),  DB::raw('sum(bill.amount) as amount'))
+                        ->select(DB::raw('max(bill.id) as id'), 'card.card_serial_no', 'card.name', DB::raw('max(bill.due_date) as due_date'),  DB::raw('sum(bill.amount) as amount'))
                         ->leftJoin('card', 'user.id', '=', 'card.user_id')
                         ->leftJoin('bill', 'card.id', '=', 'bill.card_id')
                         ->where('user.id', $user_id)
                         ->where('card.status', 'active')
                         ->where('bill.status', 'unpaid')
                         ->orderBy('bill.created_at', 'desc')
-                        ->groupBy('bill.card_id', 'card.card_serial_no')
+                        ->groupBy('bill.card_id', 'card.card_serial_no', 'card.name')
                         ->get();
 
         $penalty = DB::table('user')
@@ -130,7 +130,24 @@ class BillController extends Controller
 
         foreach($payments as $payment)
         {
-            $bill = BillModel::where('id', $payment->bill_id)->update(['status'=>'paid']);
+            $bill = BillModel::where('id', $payment->bill_id)->first();
+            $bill->status = 'paid';
+            $bill->update();
+            $date1 = date_create($bill->due_date);
+            $date2 = date_create(date('Y-m-d'));
+            $diff = date_diff($date1, $date2);
+            $difference = $diff->format("%R%a");
+            if($difference > 0){
+                TransactionModel::create([
+                    'card_id' => null,
+                    'user_id' => $bill->user_id,
+                    'type' => 'penalty',
+                    'amount' => $bill->amount * 0.01 * $difference / 30,
+                    'toll_station_id' => null,
+                    'station_type' => 'late_payment',
+                    'car_plate_no' => null
+                ]);
+            }
             $unpaid_bills = UnpaidBillModel::where('bill_id', $payment->bill_id)->get();
             foreach($unpaid_bills as $unpaid_bill)
             {

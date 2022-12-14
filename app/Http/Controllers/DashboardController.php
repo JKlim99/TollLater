@@ -21,14 +21,14 @@ class DashboardController extends Controller
         $name = $user->fullname;
         
         $cards = DB::table('user')
-                        ->select('card.card_serial_no', DB::raw('max(bill.due_date) as due_date'),  DB::raw('sum(bill.amount) as amount'))
+                        ->select(DB::raw('max(card.id) as id'), 'card.card_serial_no', 'card.name', DB::raw('max(bill.due_date) as due_date'),  DB::raw('sum(bill.amount) as amount'))
                         ->leftJoin('card', 'user.id', '=', 'card.user_id')
                         ->leftJoin('bill', 'card.id', '=', 'bill.card_id')
                         ->where('user.id', $user_id)
                         ->where('card.status', 'active')
                         ->where('bill.status', 'unpaid')
                         ->orderBy('bill.created_at', 'desc')
-                        ->groupBy('bill.card_id', 'card.card_serial_no')
+                        ->groupBy('bill.card_id', 'card.card_serial_no', 'card.name')
                         ->get();
 
         $penalty = DB::table('user')
@@ -72,5 +72,27 @@ class DashboardController extends Controller
         ]);
 
         return redirect('/dashboard')->with(['notice'=>'Your new card has been added.']);
+    }
+
+    public function editCardName(Request $request, $id)
+    {
+        $user_id = session('id');
+        $key = session('key');
+        $user = UserModel::where('id', $user_id)->where('hash', $key)->first();
+        if(!$user){
+            return redirect('/logout');
+        }
+
+        $name = $request->input('name', null);
+        $card_found = CardModel::where('id', $id)->first();
+        if(!$card_found)
+        {
+            return redirect('/dashboard');
+        }
+
+        $card_found->name = $name;
+        $card_found->update();
+
+        return redirect('/dashboard')->with(['notice'=>'Card name has updated successfully.']);
     }
 }

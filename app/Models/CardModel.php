@@ -25,7 +25,8 @@ class CardModel extends Model
         'user_id',
         'card_serial_no',
         'status',
-        'batch_no'
+        'batch_no',
+        'name'
     ];
 
     public function transactions()
