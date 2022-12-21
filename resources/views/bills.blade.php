@@ -36,6 +36,13 @@ $active = 'bill';
         </thead>
         <tbody>
             @foreach($bills as $bill)
+            <?php
+            $date1 = date('Y-m-d', strtotime($bill->created_at));
+            $date2 = date('Y-m-d', strtotime($bill->due_date));
+            if($date1 == $date2){
+                continue;
+            }
+            ?>
             <tr>
                 <td>{{date('d M Y', strtotime($bill->created_at));}}</td>
                 <td>RM{{number_format($bill->amount, 2, '.', ',');}}</td>
